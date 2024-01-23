@@ -1,13 +1,24 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { createEditor } from "slate";
-import { useState, useRef } from "react";
+import { Node, createEditor } from "slate";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+
+import {CodeElement, DefaultElement, Leaf} from "./ui/textelements";
 
 // TypeScript users only add this code
-import { BaseEditor, Descendant } from 'slate'
-import { Slate, Editable, ReactEditor, withReact } from 'slate-react'
+import { BaseEditor, Descendant, Transforms, Element, Editor } from 'slate'
+import { Slate, Editable, ReactEditor, withReact, RenderLeafProps, RenderElementProps } from 'slate-react'
+import { EditorControl } from "@/lib/editorControls";
+import { Menubar } from "./ui/menubar";
+import { Button } from "./ui/button";
 
-type CustomElement = { type: 'paragraph'; children: CustomText[] }
-type CustomText = { text: string }
+type CustomElement = { type: 'paragraph' | 'code'; 
+                        children: CustomText[] }
+
+type CustomText = { text: string; 
+                    bold:boolean; 
+                    italic:boolean; 
+                    underline:boolean; 
+                    strikethrough:boolean; }
 
 declare module 'slate' {
   interface CustomTypes {
@@ -21,13 +32,37 @@ const Paper =() =>{
     const [docTitle, setDocTitle] = useState("Paper Name");
     const [docDesc, setDocDesc] = useState("A Brainstorming Page");
     const [editor] = useState(()=>withReact(createEditor()));
+    const localtext = useRef<string|null>(null);
 
-    const editableElement = useRef(null);
+    // Define a rendering function based on the element passed to `props`. We use
+    // `useCallback` here to memoize the function for subsequent renders.
+    const renderElement = useCallback((props:RenderElementProps) => {
+        switch (props.element.type) {
+        case 'code':
+            return <CodeElement {...props} />
+        default:
+            return <DefaultElement {...props} />
+        }
+    }, [])
 
-    const initialValue:Descendant[] = [{
-        type:"paragraph",
-        children: [{ text: 'A line of text in a paragraph.' }],
-    },]
+
+    const renderLeaf = useCallback((props:RenderLeafProps) =>{
+        return <Leaf {...props}/>
+    },[])
+
+    useEffect(()=>{
+       const localval= localStorage.getItem("content");
+       localtext.current = localval;
+    },[])
+
+    const initialValue:Descendant[] = useMemo(
+        ()=> localtext.current != null ? 
+                JSON.parse(localtext.current) :
+                [{
+                    type:"paragraph",
+                    children: [{ text: ` Hellooo  this is a line of text` }],
+                },]
+        ,[])
 
     return(
         <Card className="w-[90svw] h-[90svh]">
@@ -36,12 +71,58 @@ const Paper =() =>{
             <CardDescription><input type="text" value={docDesc} className="w-full" onChange={(e)=>setDocDesc(e.target.value)}/></CardDescription>
         </CardHeader>
         <CardContent>
-            <Slate editor={editor} initialValue={initialValue}>
-                <article className="m-2 group h-full focus:" onFocus={() => editableElement.current?.focus() }>
-                    <Editable ref={editableElement} className="h-full my-0" onKeyDown={(e)=>{
-                        if ("vishnu".indexOf(e.key) != -1){
-                            console.log("you have entered a magic Letter:",e.key)
+            <Slate editor={editor} 
+                    initialValue={initialValue}
+                    onChange={value => {
+                        const isAstChange = editor.operations.some(
+                          op => 'set_selection' !== op.type
+                        )
+                        if (isAstChange) {
+                          // Save the value to Local Storage.
+                          const content = JSON.stringify(value)
+                          localStorage.setItem('content', content)
                         }
+                      }}>
+                <article className="m-2 h-full">
+                <div className="flex border-2 rounded-lg justify-start gap-3 p-1 w-full">
+                    <Button
+                    onMouseDown={event => {
+                        event.preventDefault()
+                        EditorControl.toggleBoldMark(editor)
+                    }}
+                    >
+                    Bold
+                    </Button>
+                    <Button
+                    onMouseDown={event => {
+                        event.preventDefault()
+                        EditorControl.toggleCodeBlock(editor)
+                    }}
+                    >
+                    Code Block
+                    </Button>
+                </div>
+                    <Editable  className="h-full my-0" 
+                        renderElement={renderElement}
+                        renderLeaf={renderLeaf}
+                        onKeyDown={(e)=>{
+                        
+                            if(!e.ctrlKey) {
+                                return
+                            }
+
+                            switch(e.key){
+                                case "`":{
+                                    e.preventDefault()
+                                    EditorControl.toggleCodeBlock(editor)
+                                    break
+                                }
+                                case "b":{
+                                    e.preventDefault();
+                                    EditorControl.toggleBoldMark(editor)
+                                    break
+                                }
+                            }
                     }}/>
                 </article>
             </Slate>
