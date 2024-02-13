@@ -29,8 +29,8 @@ declare module 'slate' {
 }
 
 const Paper =() =>{
-    const [docTitle, setDocTitle] = useState("Paper Name");
-    const [docDesc, setDocDesc] = useState("A Brainstorming Page");
+    const [docTitle, setDocTitle] = useState<string>("Paper Name");
+    const [docDesc, setDocDesc] = useState<string>("A Brainstorming Page");
     const [editor] = useState(()=>withReact(createEditor()));
     const localtext = useRef<string|null>(null);
 
@@ -83,7 +83,7 @@ const Paper =() =>{
                           localStorage.setItem('content', content)
                         }
                       }}>
-                <article className="m-2 h-full">
+                <article className="m-2 h-fit">
                 <div className="flex border-2 rounded-lg justify-start gap-3 p-1 w-full">
                     <Button
                     onMouseDown={event => {
@@ -102,7 +102,7 @@ const Paper =() =>{
                     Code Block
                     </Button>
                 </div>
-                    <Editable  className="h-full my-0" 
+                    <Editable  className="focus:outline-none h-fit  my-0" 
                         renderElement={renderElement}
                         renderLeaf={renderLeaf}
                         onKeyDown={(e)=>{

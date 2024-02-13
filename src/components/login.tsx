@@ -55,7 +55,7 @@ const Login =() =>{
                         </FormControl>
                     </FormItem>
                 )}/>
-                <Button>Sign Up</Button>
+                <Button>Login</Button>
         </form>
 
     </Form>
