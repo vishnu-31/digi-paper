@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google"
 import "./globals.css";
 
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+
 import { cn } from "@/lib/utils"
 import NavBar from "@/components/navbar";
 
@@ -23,15 +25,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
-          ) }
-      >
-        <NavBar/>
-        {children}
-      </body>
+      <UserProvider>      
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased",
+            fontSans.variable
+            ) }
+        >
+          <NavBar/>
+          {children}
+        </body>
+      </UserProvider>
     </html>
   );
 }
