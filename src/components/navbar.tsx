@@ -1,24 +1,50 @@
-import { Button } from "./ui/button";
-import Link from "next/link";
-import Image from "next/image";
-import logo from "../../logo/DigiPaper.png"
+"use client";
 
-const NavBar = () => {
-  return( 
-    <div className="w-full flex m-0 p-2 items-center justify-between">
-      <div className="flex items-center text-3xl py-3 h-16 font-bold w-full "> 
-        <Image src={logo} width={50} height={50} alt={"Logo of DigiPaper"}/>
-        DigiPaper
-      </div>
-      <div>
-        <ul className="flex gap-3 p-3">
-          <li><Link href="/api/auth/login"><Button>Login</Button></Link></li>
-          <li><Link href="/api/auth/login"><Button>SignUp</Button></Link></li>
-        </ul>
-      </div>
+import * as React from "react"
+import Link from "next/link"
+import Image from "next/image"
 
-    </div>
+import logo from "@/../logo/DigiPaper.png"; 
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+
+
+const NavigationMenuDemo = () =>{
+
+  return(
+  <div className="flex items-center justify-between p-3">
+  <Image width={40} height={40} src={logo} alt={"logo of digipaper"}/>
+  <NavigationMenu>
+    <NavigationMenuList className="list-none">   
+      <NavigationMenuItem>
+        <Link href="/api/auth/login" passHref>
+          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+            Login
+          </NavigationMenuLink>
+        </Link>
+      </NavigationMenuItem>
+      <NavigationMenuItem>
+        <Link href="/api/auth/login" passHref>
+          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+            Signup
+          </NavigationMenuLink>
+        </Link>
+      </NavigationMenuItem>
+
+
+    </NavigationMenuList>
+
+  </NavigationMenu>
+  </div>
   );
 }
 
-export default NavBar;
+
+export default NavigationMenuDemo;

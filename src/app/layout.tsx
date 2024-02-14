@@ -5,7 +5,7 @@ import "./globals.css";
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 
 import { cn } from "@/lib/utils"
-import NavBar from "@/components/navbar";
+import NavigationMenuDemo from "@/components/navbar";
 
 
 export const fontSans = FontSans({
@@ -28,11 +28,11 @@ export default function RootLayout({
       <UserProvider>      
         <body
           className={cn(
-            "min-h-screen bg-background font-sans antialiased",
+            "min-h-screen w-full bg-background font-sans antialiased",
             fontSans.variable
             ) }
         >
-          <NavBar/>
+          <NavigationMenuDemo/>
           {children}
         </body>
       </UserProvider>
